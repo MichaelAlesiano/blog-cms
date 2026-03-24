@@ -1,0 +1,46 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Tag — Blog CMS{% endblock %}
+
+{% block body %}
+    <div class="flex items-center justify-between mb-8">
+        <h1 class="text-2xl font-bold text-gray-900">Tag</h1>
+        <a href="{{ path('admin_tag_new') }}" class="btn btn-primary">+ Nuovo tag</a>
+    </div>
+
+    <div class="admin-card">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th class="hidden sm:table-cell">Slug</th>
+                    <th>Articoli</th>
+                    <th class="text-right">Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tag in tags %}
+                    <tr>
+                        <td class="font-medium">{{ tag.name }}</td>
+                        <td class="hidden sm:table-cell text-gray-500">{{ tag.slug }}</td>
+                        <td class="text-gray-400">{{ tag.articles|length }}</td>
+                        <td class="text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <a href="{{ path('admin_tag_edit', {id: tag.id}) }}" class="btn-ghost text-indigo-400 text-sm">Modifica</a>
+                                <form action="{{ path('admin_tag_delete', {id: tag.id}) }}" method="post"
+                                    onsubmit="return confirm('Sei sicuro di voler eliminare questo tag?')">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ tag.id) }}">
+                                    <button type="submit" class="btn-danger text-sm">Elimina</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center py-8 text-gray-500">Nessun tag presente.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

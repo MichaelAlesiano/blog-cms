@@ -1,0 +1,64 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Articoli — Blog CMS{% endblock %}
+
+{% block body %}
+    <div class="flex items-center justify-between mb-8">
+        <h1 class="text-2xl font-bold text-gray-900">Articoli</h1>
+        <a href="{{ path('admin_article_new') }}" class="btn btn-primary">+ Nuovo articolo</a>
+    </div>
+
+    <div class="admin-card">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Titolo</th>
+                    <th class="hidden md:table-cell">Categoria</th>
+                    <th class="text-center hidden sm:table-cell">👁</th>
+                    <th class="text-center hidden sm:table-cell">👍</th>
+                    <th class="text-center hidden sm:table-cell">💬</th>
+                    <th>Stato</th>
+                    <th class="text-right">Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for article in articles %}
+                    <tr>
+                        <td class="font-medium">{{ article.title }}</td>
+                        <td class="hidden md:table-cell text-gray-500">{{ article.category ? article.category.name : '—' }}</td>
+                        <td class="text-center hidden sm:table-cell text-gray-500">{{ article.views }}</td>
+                        <td class="text-center hidden sm:table-cell text-gray-500">{{ article.likes }}</td>
+                        <td class="text-center hidden sm:table-cell text-gray-500">{{ article.comments|length }}</td>
+                        <td>
+                            {% if article.published %}
+                                <span class="badge badge-success">Pubblicato</span>
+                            {% else %}
+                                <span class="badge badge-warning">Bozza</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <a href="{{ path('admin_article_preview', {id: article.id}) }}" target="_blank" class="btn-ghost text-gray-400 text-sm" title="Anteprima">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                </a>
+                                <a href="{{ path('admin_article_edit', {id: article.id}) }}" class="btn-ghost text-indigo-400 text-sm">Modifica</a>
+                                <form action="{{ path('admin_article_delete', {id: article.id}) }}" method="post"
+                                    onsubmit="return confirm('Sei sicuro di voler eliminare questo articolo?')">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ article.id) }}">
+                                    <button type="submit" class="btn-danger text-sm">Elimina</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-8 text-gray-500">Nessun articolo presente.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

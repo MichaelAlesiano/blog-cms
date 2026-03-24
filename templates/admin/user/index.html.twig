@@ -1,0 +1,50 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Utenti — Blog CMS{% endblock %}
+
+{% block body %}
+    <div class="flex items-center justify-between mb-8">
+        <h1 class="text-2xl font-bold text-gray-900">Utenti</h1>
+        <a href="{{ path('admin_user_new') }}" class="btn btn-primary">+ Nuovo utente</a>
+    </div>
+
+    <div class="admin-card">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Ruolo</th>
+                    <th class="text-right">Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td class="font-medium">{{ user.fullName }}</td>
+                        <td class="text-gray-400">{{ user.email }}</td>
+                        <td>
+                            {% if 'ROLE_ADMIN' in user.roles %}
+                                <span class="badge badge-success">Admin</span>
+                            {% else %}
+                                <span class="badge badge-warning">Utente</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <a href="{{ path('admin_user_edit', {id: user.id}) }}" class="btn-ghost text-indigo-400 text-sm">Modifica</a>
+                                {% if user != app.user %}
+                                    <form action="{{ path('admin_user_delete', {id: user.id}) }}" method="post"
+                                        onsubmit="return confirm('Sei sicuro di voler eliminare questo utente?')">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                                        <button type="submit" class="btn-danger text-sm">Elimina</button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

@@ -1,0 +1,206 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ article.title }} — Blog CMS{% endblock %}
+
+{% block body %}
+<div class="max-w-6xl mx-auto px-4 py-8">
+
+    <div class="flex flex-col md:flex-row gap-8">
+
+        <article class="flex-1">
+            <div class="mb-4">
+                <a href="{{ path('blog_index') }}" class="text-sm text-gray-400 hover:text-indigo-600 transition">← Tutti gli articoli</a>
+            </div>
+
+            {% if article.coverImage %}
+                <img src="{{ asset('uploads/covers/' ~ article.coverImage) }}" alt="{{ article.title }}"
+                    class="w-full h-64 sm:h-80 object-cover rounded-xl mb-6 shadow-md">
+            {% endif %}
+
+            <div class="flex flex-wrap items-center gap-3 mb-4">
+                {% if article.category %}
+                    <a href="{{ path('blog_index', {category: article.category.slug}) }}"
+                        class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full hover:bg-indigo-100 transition">
+                        {{ article.category.name }}
+                    </a>
+                {% endif %}
+                <span class="text-sm text-gray-400">{{ article.createdAt|date('d F Y') }}</span>
+                {% if article.author %}
+                    <span class="text-sm text-gray-400">· {{ article.author.fullName }}</span>
+                {% endif %}
+                <span class="text-sm text-gray-400">· {{ article.views }} visualizzazioni</span>
+            </div>
+
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+                {{ article.title }}
+            </h1>
+
+            {% if article.excerpt %}
+                <p class="text-lg text-gray-500 mb-6 leading-relaxed">{{ article.excerpt }}</p>
+            {% endif %}
+
+            <div class="text-gray-700 leading-relaxed space-y-4">
+                {{ article.content|nl2br }}
+            </div>
+
+            {% if article.tags|length > 0 %}
+                <div class="mt-8 pt-6 border-t border-gray-200">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-sm text-gray-400">Tag:</span>
+                        {% for tag in article.tags %}
+                            <span class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full">
+                                {{ tag.name }}
+                            </span>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {# Like / Dislike #}
+            <div class="mt-6 pt-6 border-t border-gray-200">
+                <p class="text-sm text-gray-400 mb-3">Questo articolo ti è stato utile?</p>
+                <div class="flex items-center gap-3" id="reaction-buttons">
+                    {% if hasReacted %}
+                        <span class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg text-sm text-gray-400">
+                            👍 <span>{{ article.likes }}</span>
+                        </span>
+                        <span class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg text-sm text-gray-400">
+                            👎 <span>{{ article.dislikes }}</span>
+                        </span>
+                        <span class="text-xs text-gray-400">Hai già votato</span>
+                    {% else %}
+                        <button onclick="sendReaction('like')" id="btn-like"
+                            class="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-200 rounded-lg hover:border-emerald-400 hover:bg-emerald-50 transition cursor-pointer text-sm text-gray-600 shadow-sm">
+                            👍 <span id="like-count">{{ article.likes }}</span>
+                        </button>
+                        <button onclick="sendReaction('dislike')" id="btn-dislike"
+                            class="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-200 rounded-lg hover:border-red-400 hover:bg-red-50 transition cursor-pointer text-sm text-gray-600 shadow-sm">
+                            👎 <span id="dislike-count">{{ article.dislikes }}</span>
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# Commenti #}
+            <div class="mt-8 pt-8 border-t border-gray-200">
+                <h2 class="text-xl font-bold text-gray-900 mb-6">
+                    Commenti ({{ article.comments|length }})
+                </h2>
+
+                {% if article.comments|length > 0 %}
+                    <div class="space-y-4 mb-8">
+                        {% for comment in article.comments %}
+                            <div class="bg-white rounded-lg shadow-sm border border-indigo-100/60 p-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-semibold text-gray-800">{{ comment.authorName }}</span>
+                                    <span class="text-xs text-gray-400">{{ comment.createdAt|date('d/m/Y H:i') }}</span>
+                                </div>
+                                <p class="text-sm text-gray-600 leading-relaxed">{{ comment.content|nl2br }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="bg-white rounded-xl shadow-md border border-indigo-100/60 p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Lascia un commento</h3>
+
+                    {{ form_start(commentForm, {'attr': {'class': 'space-y-4', 'novalidate': 'novalidate'}}) }}
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                {{ form_label(commentForm.authorName, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-600 mb-1'}}) }}
+                                {{ form_widget(commentForm.authorName, {'attr': {'class': 'w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 focus:bg-white outline-none transition placeholder-gray-400'}}) }}
+                                {{ form_errors(commentForm.authorName, {'attr': {'class': 'text-xs text-red-500 mt-1'}}) }}
+                            </div>
+                            <div>
+                                {{ form_label(commentForm.authorEmail, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-600 mb-1'}}) }}
+                                {{ form_widget(commentForm.authorEmail, {'attr': {'class': 'w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 focus:bg-white outline-none transition placeholder-gray-400'}}) }}
+                                {{ form_errors(commentForm.authorEmail, {'attr': {'class': 'text-xs text-red-500 mt-1'}}) }}
+                            </div>
+                        </div>
+
+                        <div>
+                            {{ form_label(commentForm.content, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-600 mb-1'}}) }}
+                            {{ form_widget(commentForm.content, {'attr': {'class': 'w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 focus:bg-white outline-none transition placeholder-gray-400'}}) }}
+                            {{ form_errors(commentForm.content, {'attr': {'class': 'text-xs text-red-500 mt-1'}}) }}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Pubblica commento</button>
+
+                    {{ form_end(commentForm) }}
+                </div>
+            </div>
+
+        </article>
+
+        <aside class="w-full md:w-64 shrink-0">
+            <div class="bg-slate-900 rounded-xl p-5 sticky top-24">
+                <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Categorie</h3>
+                <ul class="space-y-1">
+                    <li>
+                        <a href="{{ path('blog_index') }}"
+                            class="block text-sm px-3 py-1.5 rounded-lg text-slate-400 hover:bg-slate-800 transition">
+                            Tutte
+                        </a>
+                    </li>
+                    {% for category in categories %}
+                        <li>
+                            <a href="{{ path('blog_index', {category: category.slug}) }}"
+                                class="block text-sm px-3 py-1.5 rounded-lg transition
+                                    {% if article.category and article.category.id == category.id %}bg-indigo-600 text-white font-medium{% else %}text-slate-400 hover:bg-slate-800{% endif %}">
+                                {{ category.name }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </aside>
+
+    </div>
+
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% if not hasReacted %}
+    <script>
+        let hasReacted = false;
+
+        function sendReaction(type) {
+            if (hasReacted) return;
+            hasReacted = true;
+
+            const articleId = {{ article.id }};
+            const url = type === 'like'
+                ? '/article/' + articleId + '/like'
+                : '/article/' + articleId + '/dislike';
+
+            fetch(url, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => {
+                if (response.status === 403) return;
+                return response.json();
+            })
+            .then(data => {
+                if (!data) return;
+                document.getElementById('like-count').textContent = data.likes;
+                document.getElementById('dislike-count').textContent = data.dislikes;
+
+                const activeBtn = type === 'like' ? document.getElementById('btn-like') : document.getElementById('btn-dislike');
+                activeBtn.classList.add('border-indigo-400', 'bg-indigo-50');
+
+                document.getElementById('btn-like').disabled = true;
+                document.getElementById('btn-dislike').disabled = true;
+                document.getElementById('btn-like').classList.add('opacity-60', 'cursor-default');
+                document.getElementById('btn-dislike').classList.add('opacity-60', 'cursor-default');
+            })
+            .catch(() => {
+                hasReacted = false;
+            });
+        }
+    </script>
+    {% endif %}
+{% endblock %}

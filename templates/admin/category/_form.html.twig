@@ -1,0 +1,28 @@
+<div class="admin-form">
+{{ form_start(form, {'attr': {'class': 'space-y-6', 'novalidate': 'novalidate'}}) }}
+
+    <div class="admin-card p-6 space-y-5 max-w-xl">
+        <div>
+            {{ form_label(form.name) }}
+            {{ form_widget(form.name) }}
+            {{ form_errors(form.name, {'attr': {'class': 'form-error'}}) }}
+        </div>
+
+        <div>
+            {{ form_label(form.slug) }}
+            {{ form_widget(form.slug) }}
+            <p class="text-xs text-gray-600 mt-1">{{ form.slug.vars.help }}</p>
+            {{ form_errors(form.slug, {'attr': {'class': 'form-error'}}) }}
+        </div>
+
+        <div>
+            {{ form_label(form.description) }}
+            {{ form_widget(form.description, {'attr': {'rows': 3}}) }}
+            {{ form_errors(form.description, {'attr': {'class': 'form-error'}}) }}
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Salva categoria</button>
+
+{{ form_end(form) }}
+</div>

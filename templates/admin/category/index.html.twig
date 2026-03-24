@@ -1,0 +1,46 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Categorie — Blog CMS{% endblock %}
+
+{% block body %}
+    <div class="flex items-center justify-between mb-8">
+        <h1 class="text-2xl font-bold text-gray-900">Categorie</h1>
+        <a href="{{ path('admin_category_new') }}" class="btn btn-primary">+ Nuova categoria</a>
+    </div>
+
+    <div class="admin-card">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th class="hidden sm:table-cell">Slug</th>
+                    <th>Articoli</th>
+                    <th class="text-right">Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in categories %}
+                    <tr>
+                        <td class="font-medium">{{ category.name }}</td>
+                        <td class="hidden sm:table-cell text-gray-500">{{ category.slug }}</td>
+                        <td class="text-gray-400">{{ category.articles|length }}</td>
+                        <td class="text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <a href="{{ path('admin_category_edit', {id: category.id}) }}" class="btn-ghost text-indigo-400 text-sm">Modifica</a>
+                                <form action="{{ path('admin_category_delete', {id: category.id}) }}" method="post"
+                                    onsubmit="return confirm('Sei sicuro di voler eliminare questa categoria?')">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ category.id) }}">
+                                    <button type="submit" class="btn-danger text-sm">Elimina</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center py-8 text-gray-500">Nessuna categoria presente.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

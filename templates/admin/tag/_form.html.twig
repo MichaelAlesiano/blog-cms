@@ -1,0 +1,15 @@
+<div class="admin-form">
+{{ form_start(form, {'attr': {'class': 'space-y-6', 'novalidate': 'novalidate'}}) }}
+
+    <div class="admin-card p-6 space-y-5 max-w-xl">
+        <div>
+            {{ form_label(form.name) }}
+            {{ form_widget(form.name) }}
+            {{ form_errors(form.name, {'attr': {'class': 'form-error'}}) }}
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Salva tag</button>
+
+{{ form_end(form) }}
+</div>

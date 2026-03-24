@@ -1,0 +1,11 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Modifica: {{ tag.name }} — Blog CMS{% endblock %}
+
+{% block body %}
+    <div class="mb-6">
+        <a href="{{ path('admin_tag_index') }}" class="text-sm text-gray-500 hover:text-indigo-600 transition">← Torna alla lista</a>
+    </div>
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Modifica tag</h1>
+    {{ include('admin/tag/_form.html.twig') }}
+{% endblock %}

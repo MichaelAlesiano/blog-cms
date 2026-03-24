@@ -1,0 +1,56 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Commenti — Blog CMS{% endblock %}
+
+{% block body %}
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold text-gray-900">Commenti</h1>
+        <p class="text-sm text-gray-500 mt-1">{{ comments|length }} commenti totali</p>
+    </div>
+
+    <div class="admin-card">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Autore</th>
+                    <th>Commento</th>
+                    <th class="hidden md:table-cell">Articolo</th>
+                    <th class="hidden sm:table-cell">Data</th>
+                    <th class="text-right">Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comment in comments %}
+                    <tr>
+                        <td>
+                            <p class="font-medium">{{ comment.authorName }}</p>
+                            {% if comment.authorEmail %}
+                                <p class="text-xs text-gray-500">{{ comment.authorEmail }}</p>
+                            {% endif %}
+                        </td>
+                        <td class="text-gray-400 text-sm max-w-xs truncate">
+                            {{ comment.content|length > 100 ? comment.content[:100] ~ '...' : comment.content }}
+                        </td>
+                        <td class="hidden md:table-cell">
+                            <a href="{{ path('admin_article_edit', {id: comment.article.id}) }}" class="text-sm text-indigo-400 hover:text-indigo-300">
+                                {{ comment.article.title|length > 30 ? comment.article.title[:30] ~ '...' : comment.article.title }}
+                            </a>
+                        </td>
+                        <td class="hidden sm:table-cell text-gray-500 text-sm">{{ comment.createdAt|date('d/m/Y H:i') }}</td>
+                        <td class="text-right">
+                            <form action="{{ path('admin_comment_delete', {id: comment.id}) }}" method="post"
+                                onsubmit="return confirm('Eliminare questo commento?')">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ comment.id) }}">
+                                <button type="submit" class="btn-danger text-sm">Elimina</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-8 text-gray-500">Nessun commento presente.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

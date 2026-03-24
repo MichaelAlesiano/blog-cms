@@ -1,0 +1,91 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Anteprima: {{ article.title }} — Blog CMS{% endblock %}
+
+{% block body %}
+<div class="max-w-6xl mx-auto px-4 py-8">
+
+    <div class="bg-amber-50 border border-amber-300 rounded-lg p-4 mb-6 flex items-center justify-between shadow-sm">
+        <div class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+            <span class="text-sm font-medium text-amber-700">
+                Anteprima —
+                {% if article.published %}
+                    Questo articolo è pubblicato
+                {% else %}
+                    Questo articolo è in bozza e non è visibile al pubblico
+                {% endif %}
+            </span>
+        </div>
+        <a href="{{ path('admin_article_edit', {id: article.id}) }}" class="btn btn-primary text-sm !py-1.5 !px-3">
+            ← Torna all'editor
+        </a>
+    </div>
+
+    <div class="flex flex-col md:flex-row gap-8">
+
+        <article class="flex-1">
+            {% if article.coverImage %}
+                <img src="{{ asset('uploads/covers/' ~ article.coverImage) }}" alt="{{ article.title }}"
+                    class="w-full h-64 sm:h-80 object-cover rounded-xl mb-6 shadow-lg">
+            {% endif %}
+
+            <div class="flex flex-wrap items-center gap-3 mb-4">
+                {% if article.category %}
+                    <span class="text-xs font-semibold text-indigo-700 bg-indigo-100 px-2.5 py-1 rounded-full">
+                        {{ article.category.name }}
+                    </span>
+                {% endif %}
+                <span class="text-sm text-gray-400">{{ article.createdAt|date('d F Y') }}</span>
+                {% if article.author %}
+                    <span class="text-sm text-gray-400">· {{ article.author.fullName }}</span>
+                {% endif %}
+            </div>
+
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+                {{ article.title }}
+            </h1>
+
+            {% if article.excerpt %}
+                <p class="text-lg text-gray-500 mb-6 leading-relaxed">{{ article.excerpt }}</p>
+            {% endif %}
+
+            <div class="bg-white rounded-xl shadow-md p-6 sm:p-8 text-gray-700 leading-relaxed space-y-4">
+                {{ article.content|nl2br }}
+            </div>
+
+            {% if article.tags|length > 0 %}
+                <div class="mt-6 flex flex-wrap items-center gap-2">
+                    <span class="text-sm text-gray-400">Tag:</span>
+                    {% for tag in article.tags %}
+                        <span class="text-xs font-semibold text-indigo-700 bg-indigo-100 px-2.5 py-1 rounded-full">
+                            {{ tag.name }}
+                        </span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </article>
+
+        <aside class="w-full md:w-64 shrink-0">
+            <div class="bg-slate-900 rounded-xl p-5 sticky top-24 shadow-lg">
+                <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Categorie</h3>
+                <ul class="space-y-1">
+                    {% for category in categories %}
+                        <li>
+                            <span class="block text-sm px-3 py-1.5 rounded-lg
+                                {% if article.category and article.category.id == category.id %}bg-indigo-600 text-white font-medium{% else %}text-slate-400{% endif %}">
+                                {{ category.name }}
+                            </span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </aside>
+
+    </div>
+
+</div>
+{% endblock %}
